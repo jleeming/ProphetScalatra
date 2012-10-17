@@ -1,4 +1,4 @@
-package spike.scalatra
+package prophet.scalatra
 
 import org.scalatra.test.scalatest.ScalatraSuite
 import org.scalatest.WordSpec
