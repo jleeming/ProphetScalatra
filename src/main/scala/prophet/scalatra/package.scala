@@ -1,4 +1,4 @@
-package spike.scalatra
+package prophet.scalatra
 
 trait JsonHelpers {
   import net.liftweb.json._
