@@ -1,22 +1,32 @@
 package prophet.scalatra
 
+import prophet._
 import org.scalatra._
 import scalate.ScalateSupport
 import net.liftweb.json._
 import net.liftweb.json.JsonDSL._
+import prophet.services.cache.Clear
+import prophet.services.Prophet
 
 case class User(name: String, age: Int)
 
-class RestApiServlet extends ScalatraServlet with ScalateSupport with JsonHelpers {
+class RestApiServlet extends ScalatraServlet with ScalateSupport with JsonHelpers with Initializable {
   before("/*") {
     contentType = "application/json;charset=UTF-8"
   }
 
   get("/currency/:currencyType") {
     params("currencyType") match {
-      case currencyType => Json(User("test " + currencyType, 30))
+      case currencyType => Json(Prophet.forecast(currencyType.toUpperCase()))  
+        //Json(User("test " + currencyType, 30))
     }
   }
+  
+  get("/cache") {
+    System.cacheMaster ! Clear
+    ("success" -> true) ~ ("message" -> "OK")
+  }
+  
   
   get("/api/json/users/:id") {
     params("id") match {
@@ -46,5 +56,10 @@ class RestApiServlet extends ScalatraServlet with ScalateSupport with JsonHelper
     contentType = "application/json;charset=UTF-8"
     status(404)
     compact(render(("message" -> "Not found.")))
+  }
+  
+  override def destroy() = {
+    System.system.shutdown
+    super.destroy()
   }
 }
